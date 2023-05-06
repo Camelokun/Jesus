@@ -73,6 +73,21 @@ function delete_password() {
     echo -e "\e[1m\e[31mNo se pudo eliminar la contraseña.\e[0m"
   fi
 
+# Contar el número de conexiones activas
+num_connections=$(netstat -anp | grep udp | grep -v "0.0.0.0:68" | grep -v ":::68" | wc -l)
+
+# Escribir el número de conexiones en un archivo
+echo "$num_connections" > /var/run/udp-custom/num_connections
+
+# Escribir el número de conexiones en el registro
+logger "Número de conexiones UDP activas: $num_connections"
+
+# Si el número de conexiones es mayor que 10, reiniciar el servicio
+if [ "$num_connections" -gt 10 ]; then
+  systemctl restart udp-custom
+  logger "Se reinició el servicio UDP Custom debido a que el número de conexiones activas ($num_connections) superó el límite permitido."
+fi
+
   # Recargar el daemon de systemd y reiniciar el servicio
   sudo systemctl daemon-reload
   sudo systemctl restart udp-custom
