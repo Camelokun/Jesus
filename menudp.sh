@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Eliminar los caracteres de retorno de carro no deseados del archivo menudp.sh
+sed -i 's/\r//' menudp.sh
+
 # Definir la ruta del archivo JSON
 config_file="/root/udp/config.json"
 
